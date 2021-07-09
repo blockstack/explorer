@@ -1,8 +1,5 @@
-import { useRecoilValue } from 'recoil';
-import { networkModeState } from '@common/app-helpers';
 import { NetworkMode } from '@common/types/network';
+import { useAtomValue } from 'jotai/utils';
+import { networkModeState } from '@store/recoil/network';
 
-export const useNetworkMode = () => {
-  const state = useRecoilValue<NetworkMode>(networkModeState);
-  return state;
-};
+export const useNetworkMode = () => useAtomValue<NetworkMode>(networkModeState);

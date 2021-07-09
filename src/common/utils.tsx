@@ -11,13 +11,14 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { c32addressDecode } from 'c32check';
 import dayjs from 'dayjs';
-import { fetchTxList } from '@common/api/transactions';
+
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ContractCallTxs } from '@common/types/tx';
 import { Text } from '@components/typography';
 import { IconArrowLeft } from '@tabler/icons';
 import { REGTEST_CHAIN_ID, TESTNET_CHAIN_ID } from '@common/constants';
 import { NetworkMode, NetworkModes } from '@common/types/network';
+import { NextPageContext } from 'next';
 
 dayjs.extend(relativeTime);
 
@@ -227,33 +228,9 @@ export const startPad = (n: number, z = 2, s = '0'): string =>
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
   (n + '').length <= z ? ['', '-'][+(n < 0)] + (s.repeat(z) + Math.abs(n)).slice(-1 * z) : n + '';
 
-export const navgiateToRandomTx = (apiServer: string) => async () => {
-  const { results } = await fetchTxList({
-    apiServer: apiServer,
-    types: ['smart_contract', 'contract_call', 'token_transfer'],
-  })();
-  const hasNonCoinbaseTxs = results.some((tx: any) => tx.tx_type !== 'coinbase');
-
-  if (hasNonCoinbaseTxs) {
-    const nonCoinbaseResults = results.filter((tx: any) => tx.tx_type !== 'coinbase');
-    const randomNonCoinbaseTx =
-      nonCoinbaseResults[Math.floor(Math.random() * nonCoinbaseResults.length)];
-
-    await Router.push('/txid/[txid]', `/txid/${randomNonCoinbaseTx.tx_id as string}`);
-
-    return;
-  }
-
-  const randomTx = results[Math.floor(Math.random() * results.length)];
-  await Router.push('/txid/[txid]', `/txid/${randomTx.tx_id}`);
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const clarityValuetoHumanReadable = (value: any): string | null => {
-  if (value && value.repr) {
-    return value.repr;
-  }
-  return null;
+  return (value && value.repr) || null;
 };
 
 export const addSepBetweenStrings = (strings: (string | undefined)[], sep = '∙'): string => {
@@ -272,8 +249,21 @@ export const addSepBetweenStrings = (strings: (string | undefined)[], sep = '∙
 
 export const toRelativeTime = (ts: number): string => dayjs().to(ts);
 
-export const isPendingTx = (tx: Transaction | MempoolTransaction): boolean =>
-  tx && tx.tx_status === 'pending';
+export function isPendingTx(tx: MempoolTransaction | Transaction) {
+  const statuses =
+    'pending' ||
+    'dropped_replace_by_fee' ||
+    'dropped_replace_across_fork' ||
+    'dropped_too_expensive' ||
+    'dropped_stale_garbage_collect';
+
+  return tx.tx_status === statuses;
+}
+
+export const assertConfirmedTransaction = (
+  tx?: MempoolTransaction | Transaction
+): Transaction | undefined =>
+  tx ? (isPendingTx(tx) ? undefined : (tx as Transaction)) : undefined;
 
 export const border = (
   _color: ColorsStringLiteral = 'border',
@@ -370,3 +360,14 @@ export function isReactComponent(Comp: any) {
     (Comp && typeof Comp === 'object' && `$$typeof` in Comp) || (Comp && typeof Comp === 'function')
   );
 }
+
+export const getTxIdFromCtx = (ctx: NextPageContext) =>
+  ctx?.query?.txid ? queryWith0x(ctx.query?.txid.toString()) : '';
+
+export const getContractIdFromTx = (tx?: Transaction | MempoolTransaction) => {
+  if (!tx) return;
+  let contractId;
+  if (tx.tx_type === 'contract_call') contractId = tx.contract_call.contract_id;
+  if (tx.tx_type === 'smart_contract') contractId = tx.smart_contract.contract_id;
+  return contractId;
+};

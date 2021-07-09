@@ -1,4 +1,5 @@
-import { Transaction, TransactionType } from '@models/transaction.interface';
+import { Transaction } from '@stacks/stacks-blockchain-api-types';
+import { TransactionType } from '@common/constants';
 
 export const txTypeNamesMap = {
   [TransactionType.SMART_CONTRACT]: 'Contract deploy',

@@ -13,7 +13,7 @@ import {
   txContractState,
   txDetailsState,
 } from '@sandbox/store/sandbox';
-import { filterState } from '@store/filter';
+import { filterState } from '@store/recoil/filter';
 import { IconButton } from '@components/icon-button';
 import { ChevronDown } from '@components/icons/chevron-down';
 import { Transaction } from '@stacks/stacks-blockchain-api-types';

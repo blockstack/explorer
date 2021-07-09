@@ -9,9 +9,9 @@ import {
 } from '@common/utils';
 import { Meta } from '@components/meta-head';
 import type { MempoolTransaction, Transaction } from '@stacks/stacks-blockchain-api-types';
-import type { TxData } from '@common/types/tx';
 import { getContractId } from '@components/transaction-details';
 import { getTxErrorMessage } from '@common/utils/errors';
+import { useTransactionInView } from '../../hooks/currently-in-view-hooks';
 
 const getTxPageTitle = (tx: Transaction | MempoolTransaction) => {
   switch (tx.tx_type) {
@@ -94,9 +94,10 @@ const getDescription = (tx: Transaction | MempoolTransaction) => {
   }
 };
 
-export const TransactionMeta: React.FC<
-  Pick<TxData<Transaction | MempoolTransaction>, 'transaction'>
-> = ({ transaction }) => {
+export const TransactionMeta = () => {
+  const transaction = useTransactionInView();
+  if (!transaction) return null;
+
   const pageTitle = `${getTxPageTitle(transaction)}${
     transaction.tx_status === 'pending' ? ' (Pending)' : ''
   }${

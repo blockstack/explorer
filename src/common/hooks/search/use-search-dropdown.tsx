@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { useRecoilState } from 'recoil';
-import { searchDropdownState } from '@store/search';
+import { searchDropdownState } from '@store/recoil/search';
+import { useAtom } from 'jotai';
 
 export const useSearchDropdown = () => {
-  const [searchDropdown, setSearchDropdown] = useRecoilState(searchDropdownState);
+  const [searchDropdown, setSearchDropdown] = useAtom(searchDropdownState);
 
   const handleMakeVisible = () => {
     setSearchDropdown('visible');

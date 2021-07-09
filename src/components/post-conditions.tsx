@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { Box, BoxProps, ChevronIcon, Stack, Flex, Grid, FlexProps, color } from '@stacks/ui';
+import {
+  Box,
+  DynamicColorCircle,
+  ChevronIcon,
+  Stack,
+  Flex,
+  Grid,
+  FlexProps,
+  color,
+} from '@stacks/ui';
 import { CodeAccordian } from '@components/code-accordian';
 
 import pluralize from 'pluralize';
@@ -19,7 +28,6 @@ import NextLink from 'next/link';
 import { InfoIcon } from '@components/icons/info';
 import { border, capitalize, truncateMiddle, validateStacksAddress } from '@common/utils';
 import { Section } from '@components/section';
-import { DynamicColorCircle } from '@components/dynamic-color-circle';
 import { Circle } from '@components/circle';
 import { StxInline } from '@components/icons/stx-inline';
 import { getTicker } from '@components/tx-events';

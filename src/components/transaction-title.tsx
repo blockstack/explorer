@@ -3,14 +3,14 @@ import * as React from 'react';
 import { Box, BoxProps, Stack, StackProps } from '@stacks/ui';
 import { Status } from '@components/status';
 import { Tag, TagProps } from '@components/tags';
-
 import { Title } from '@components/typography';
-import { Transaction } from '@stacks/stacks-blockchain-api-types';
+
 import { getContractName, getFunctionName, microToStacks, truncateMiddle } from '@common/utils';
-import { IconChevronRight } from '@tabler/icons';
+import type { MempoolTransaction, Transaction } from '@stacks/stacks-blockchain-api-types';
+
 export interface TitleProps {
   contractName?: string;
-  tx: Transaction;
+  tx: MempoolTransaction | Transaction;
 }
 
 const Tags = ({
@@ -39,16 +39,19 @@ const TitleDetail = ({
   type,
   contractName,
   ...rest
-}: TitleProps & { status: Transaction['tx_status']; type: Transaction['tx_type'] } & BoxProps) => (
+}: TitleProps & {
+  status: Transaction['tx_status'] | MempoolTransaction['tx_status'];
+  type: Transaction['tx_type'] | MempoolTransaction['tx_type'];
+} & BoxProps) => (
   <Box {...rest}>
     <Stack isInline spacing="tight">
       <Tags type={type} />
-      <Status status={status} />
+      <Status status={status as any} />
     </Stack>
   </Box>
 );
 
-export const getTxTitle = (transaction: Transaction) => {
+export const getTxTitle = (transaction: Transaction | MempoolTransaction) => {
   switch (transaction.tx_type) {
     case 'smart_contract':
       return getContractName(transaction?.smart_contract?.contract_id);
@@ -57,7 +60,9 @@ export const getTxTitle = (transaction: Transaction) => {
     case 'token_transfer':
       return `${microToStacks(transaction.token_transfer.amount)} STX transfer`;
     case 'coinbase':
-      return `Block #${transaction.block_height} coinbase`;
+      return 'block_height' in transaction && transaction?.block_height
+        ? `Block #${transaction.block_height} coinbase`
+        : 'Coinbase';
     default:
       return truncateMiddle(transaction.tx_id, 10);
   }

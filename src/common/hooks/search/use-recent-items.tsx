@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { useRecoilState } from 'recoil';
-import { searchRecentlyViewedItemsState } from '@store/search';
+
+import { searchRecentlyViewedItemsState } from '@store/recoil/search';
 import { useApiServer } from '@common/hooks/use-api';
+import { useAtom } from 'jotai';
+import { FoundResult } from '@common/types/search-results';
 
 export const useRecentlyViewedItems = () => {
   const apiServer = useApiServer();
-  const [recentItems, setRecentItems] = useRecoilState(searchRecentlyViewedItemsState);
+  const [recentItems, setRecentItems] = useAtom(searchRecentlyViewedItemsState);
 
   const makeKey = (id: string) => `${apiServer}__${id}`;
 

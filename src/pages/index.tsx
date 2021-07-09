@@ -1,90 +1,36 @@
-import React, { memo } from 'react';
-import { Flex, Box, Grid } from '@stacks/ui';
-import { NextPage, NextPageContext } from 'next';
-import { Title } from '@components/typography';
-import { BlocksList } from '@components/blocks-list';
+import React from 'react';
+import { Grid } from '@stacks/ui';
 import { Meta } from '@components/meta-head';
-import { SearchComponent } from '@components/search/search';
+import { HomePageTop } from '@components/home-page-top';
 import { TabbedTransactionList } from '@components/tabbed-transaction-list';
-import { getSsrHomeProps } from '@common/lib/pages/home';
-import {
-  HOMEPAGE,
-  HOMEPAGE_BLOCKS_LIST,
-  HOMEPAGE_TX_LIST_CONFIRMED,
-  HOMEPAGE_TX_LIST_MEMPOOL,
-} from '@common/constants/data';
-import { useFetchBlocks } from '@common/hooks/data/use-fetch-blocks';
+import { BlocksList } from '@features/blocks-list';
 
-const ITEM_LIMIT = 10;
+import { DEFAULT_LIST_LIMIT_SMALL } from '@common/constants';
+import { withInitialQueries } from '@common/with-initial-queries';
+import { getHomePageQueries } from '@common/page-queries/home';
 
-const PageTop: React.FC = React.memo(() => (
-  <Flex
-    width="100%"
-    flexDirection="column"
-    alignItems="center"
-    maxWidth={['100%', '100%', 'calc(60% - 32px)']}
-    justify="center"
-  >
-    <Title
-      as="h1"
-      fontSize="36px"
-      display="block"
-      width="100%"
-      textAlign={['center', 'left']}
-      mt="72px"
-      mb="extra-loose"
-      color="white"
-    >
-      Stacks Explorer
-    </Title>
-    <Box width="100%">
-      <SearchComponent />
-    </Box>
-  </Flex>
-));
+import type { NextPage } from 'next';
 
-const HomeTransactions: React.FC = memo(() => {
-  return (
-    <TabbedTransactionList
-      key={HOMEPAGE}
-      confirmed={{
-        key: HOMEPAGE_TX_LIST_CONFIRMED,
-        limit: ITEM_LIMIT,
-      }}
-      mempool={{
-        key: HOMEPAGE_TX_LIST_MEMPOOL,
-        limit: ITEM_LIMIT,
-      }}
-    />
-  );
-});
-
-const Home: NextPage<any> = memo(() => {
+const Home: NextPage = () => {
   return (
     <>
       <Meta />
-      <PageTop />
+      <HomePageTop />
       <Grid
         mt="extra-loose"
         gap="extra-loose"
         gridTemplateColumns={['100%', '100%', 'calc(60% - 32px) 40%']}
         width="100%"
       >
-        <HomeTransactions />
-        <BlocksList key={HOMEPAGE_BLOCKS_LIST} fetchKey={HOMEPAGE_BLOCKS_LIST} limit={10} />
+        <TabbedTransactionList limit={DEFAULT_LIST_LIMIT_SMALL} />
+        <BlocksList limit={DEFAULT_LIST_LIMIT_SMALL} />
       </Grid>
     </>
   );
-});
+};
 
-export async function getServerSideProps(context: NextPageContext) {
-  const { dehydratedState } = await getSsrHomeProps(context);
-  return {
-    props: {
-      isHome: true,
-      dehydratedState,
-    },
-  };
-}
+Home.getInitialProps = () => {
+  return { isHome: true };
+};
 
-export default Home;
+export default withInitialQueries(Home)(getHomePageQueries);

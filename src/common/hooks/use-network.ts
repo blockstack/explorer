@@ -1,24 +1,22 @@
 import { useCallback } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { customNetworksListState, networkIndexState, networkListState } from '@store/network';
-import { useRouter } from 'next/router';
+import {
+  customNetworksListState,
+  networkIndexState,
+  networkListState,
+} from '@store/recoil/network';
 import { DEFAULT_TESTNET_INDEX, DEFAULT_MAINNET_INDEX } from '@common/constants';
-import { networkSwitchingState } from '@store/network';
+import { networkSwitchingState } from '@store/recoil/network';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { useAtom } from 'jotai';
 
 export const useNetwork = () => {
-  const router = useRouter();
-  const setNetworkList = useSetRecoilState(customNetworksListState);
-  const networkList = useRecoilValue(networkListState);
-  const [currentNetworkIndex, setIndex] = useRecoilState(networkIndexState);
-  const [networkSwitching, setNetworkSwitching] = useRecoilState(networkSwitchingState);
-  const isSwitching = networkSwitching === 'pending';
+  const setNetworkList = useUpdateAtom(customNetworksListState);
+  const networkList = useAtomValue(networkListState);
+  const [currentNetworkIndex, setIndex] = useAtom(networkIndexState);
+  const [networkSwitching, setNetworkSwitching] = useAtom(networkSwitchingState);
 
   const handleSetPendingChange = () => {
     setNetworkSwitching('pending');
-  };
-
-  const handleSetIdleChange = () => {
-    setNetworkSwitching('idle');
   };
 
   const handleAddListItem = useCallback(

@@ -6,8 +6,7 @@ import { callReadOnlyFunction, fetchContractInterface } from '@sandbox/common';
 import { SampleContracts } from '@sandbox/common/examples';
 import { StacksTestnet } from '@stacks/network';
 import { APP_DETAILS } from '@common/constants';
-import { authResponseState } from '@store/auth';
-import { Routes } from '@sandbox/common/types';
+import { authResponseState } from '@store/recoil/auth';
 
 export const appConfig = new AppConfig(['store_write', 'publish_data']);
 export const userSession = new UserSession({ appConfig });

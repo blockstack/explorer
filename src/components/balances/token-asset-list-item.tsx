@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { AddressBalanceResponse } from '@stacks/stacks-blockchain-api-types';
-import { Box, color, Flex, FlexProps, Stack } from '@stacks/ui';
+import { Box, color, DynamicColorCircle, Flex, FlexProps, Stack } from '@stacks/ui';
 import { Caption, Text } from '@components/typography';
 import { TxLink } from '@components/links';
-import { DynamicColorCircle } from '@components/dynamic-color-circle';
 import { getAssetNameParts } from '@common/utils';
 import { getTicker } from '@components/tx-events';
 

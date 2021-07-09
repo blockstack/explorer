@@ -1,31 +1,32 @@
 import React from 'react';
-import { AppConfig } from '@components/app-config';
 
-import { appGetInitialProps } from '@common/app-helpers';
-import { useSetNetworkMode } from '@common/hooks/use-set-network-mode';
+import { Devtools } from '@features/devtools';
+import { AppConfig } from '@components/app-config';
 
 import type { AppProps } from 'next/app';
 import type { NetworkModes } from '@common/types/network';
 
-import 'tippy.js/dist/tippy.css'; // optional
+import 'tippy.js/dist/tippy.css';
 import 'modern-normalize/modern-normalize.css';
 
-interface MyAppProps extends AppProps {
+interface ExporerAppProps extends AppProps {
   networkMode: NetworkModes;
+  apiServer: string;
 }
 
-function MyApp({ Component, pageProps, networkMode }: MyAppProps) {
-  const { isHome, fullWidth, dehydratedState, ...props } = pageProps;
-
-  useSetNetworkMode(networkMode);
-
+function App({
+  Component,
+  pageProps: { isHome, fullWidth, dehydratedState, ...props },
+  networkMode,
+}: ExporerAppProps) {
   return (
-    <AppConfig isHome={isHome} fullWidth={fullWidth} dehydratedState={dehydratedState}>
-      <Component networkMode={networkMode} {...props} />
-    </AppConfig>
+    <>
+      <Devtools />
+      <AppConfig isHome={isHome} fullWidth={fullWidth}>
+        <Component networkMode={networkMode} {...props} />
+      </AppConfig>
+    </>
   );
 }
 
-MyApp.getInitialProps = appGetInitialProps;
-
-export default MyApp;
+export default App;

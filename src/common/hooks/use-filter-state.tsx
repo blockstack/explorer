@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
-import { useRecoilCallback, useRecoilState } from 'recoil';
 
-import type { TxTypeFilterOptions } from '@store/filter';
-import { filterState } from '@store/filter';
+import type { TxTypeFilterOptions } from '@store/recoil/filter';
+import { filterState } from '@store/recoil/filter';
+import { useAtom } from 'jotai';
+import { useAtomCallback } from 'jotai/utils';
 
-export const useFilterState = (key: 'sandbox' | 'txList', showCoinbase = false) => {
-  const [filter, setFilterState] = useRecoilState(filterState(key));
+export const useFilterState = (key: 'sandbox' | 'txList') => {
+  const [filter, setFilterState] = useAtom(filterState(key));
 
   const handleToggleFilterPanelVisibility = useCallback(() => {
     setFilterState(state => ({ ...state, showing: !state.showing }));
@@ -21,10 +22,10 @@ export const useFilterState = (key: 'sandbox' | 'txList', showCoinbase = false) 
     [setFilterState]
   );
 
-  const handleUpdateTypes = useRecoilCallback(
-    ({ snapshot, set }) =>
-      (type, enabled) => {
-        const filters = snapshot.getLoadable(filterState(key)).contents;
+  const handleUpdateTypes = useAtomCallback<void, [type: string, enabled?: boolean]>(
+    useCallback(
+      (get, set, [type, enabled]) => {
+        const filters = get(filterState(key));
         if ('types' in filters && filters.types) {
           if (enabled) {
             const newTypes: TxTypeFilterOptions = [
@@ -42,7 +43,8 @@ export const useFilterState = (key: 'sandbox' | 'txList', showCoinbase = false) 
           }));
         }
       },
-    [key]
+      [key]
+    )
   );
 
   const handleClose = useCallback(() => {

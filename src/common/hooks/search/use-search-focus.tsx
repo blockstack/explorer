@@ -1,7 +1,7 @@
-import { searchFocusedState } from '@store/search';
-import { useRecoilFocus } from '@common/hooks/use-recoil-focus';
+import { searchFocusedState } from '@store/recoil/search';
+import { useAtomFocus } from '@common/hooks/use-atom-focus';
 
 export const useSearchFocus = () => {
-  const results = useRecoilFocus(searchFocusedState);
+  const results = useAtomFocus(searchFocusedState);
   return [...results];
 };

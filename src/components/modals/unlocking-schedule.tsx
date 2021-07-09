@@ -4,15 +4,16 @@ import { Tooltip } from '@components/tooltip';
 import { IconAlertTriangle, IconInfoCircle, IconX } from '@tabler/icons';
 import { Caption, Text, Title } from '@components/typography';
 import { useModal } from '@common/hooks/use-modal';
-import { useUnlockingState } from '@common/hooks/use-unlocking-state';
-import { MODALS } from '@common/constants';
 import { Section } from '@components/section';
-import { stxToMicroStx } from '@stacks/ui-utils';
 import { PercentageCircle } from '@components/percentage-circle';
 import { border } from '@common/utils';
 import { Badge } from '@components/badge';
 
 import dayjs from 'dayjs';
+import { useAtomValue } from 'jotai/utils';
+import { accountInViewTokenOfferingData } from '@store/currently-in-view';
+import { MODALS } from '@common/constants';
+import { currentStacksHeight } from '@store/info';
 
 const StxAmount: React.FC<BoxProps & { amount: number }> = ({ amount, ...rest }) => {
   const value = Number(Number(amount) / Math.pow(10, 6));
@@ -32,14 +33,15 @@ const StxAmount: React.FC<BoxProps & { amount: number }> = ({ amount, ...rest })
 };
 
 const OverviewCard: React.FC = () => {
-  const [state] = useUnlockingState();
-  if (!state) return null;
-  const totalNumber = state && parseFloat(state.originalTotal.replace(/,/g, ''));
-  const totalThatHasUnlocked = state && stxToMicroStx(totalNumber) - state.lockedBalance;
-  const percentage = totalThatHasUnlocked / totalNumber / 10000;
-  const data: [height: string, amount: number][] = Object.entries(state.data);
-
-  const blocksLeft = parseInt(data[data.length - 1][0]) - state.currentHeight;
+  const tokenOfferingData = useAtomValue(accountInViewTokenOfferingData);
+  if (!tokenOfferingData) return null;
+  const { total_locked, total_unlocked, unlock_schedule } = tokenOfferingData;
+  const totalNumber = parseFloat(total_locked) + parseFloat(total_unlocked);
+  const totalThatHasUnlocked = parseFloat(total_unlocked);
+  const percentage = (totalThatHasUnlocked / totalNumber) * 100;
+  const data = unlock_schedule;
+  const currentHeight = useAtomValue(currentStacksHeight);
+  const blocksLeft = data[data.length - 1].block_height - currentHeight;
 
   return (
     <Section p="extra-loose">
@@ -93,7 +95,7 @@ const OverviewCard: React.FC = () => {
           >
             <Stack>
               <Caption>Locked</Caption>
-              <StxAmount amount={state.lockedBalance} />
+              <StxAmount amount={parseFloat(total_locked)} />
             </Stack>
           </Flex>
         </Stack>
@@ -103,16 +105,11 @@ const OverviewCard: React.FC = () => {
 };
 
 const Table: React.FC = () => {
-  const [state] = useUnlockingState();
-  if (!state) return null;
-  const totalNumber = state && parseFloat(state.originalTotal.replace(/,/g, ''));
-  const total = state && stxToMicroStx(totalNumber) - state.lockedBalance;
-  const data: [height: string, amount: number][] = Object.entries(state.data);
-  const slotAmount = data[0][1];
-  const totalCompleteRows = data.filter(([height, amount]) => height < state.currentHeight);
-  const unlocked = slotAmount * totalCompleteRows.length;
-  let cumulativeAmount = total - unlocked;
-
+  const tokenOfferingData = useAtomValue(accountInViewTokenOfferingData);
+  if (!tokenOfferingData) return null;
+  const { unlock_schedule } = tokenOfferingData;
+  const currentHeight = useAtomValue(currentStacksHeight);
+  let cumulativeAmount = 0;
   return (
     <Section mt="extra-loose" px="extra-loose" pb="tight" pt={['tight', 'tight', 'unset']}>
       <Grid
@@ -141,11 +138,11 @@ const Table: React.FC = () => {
         <Caption textAlign="right">Amount</Caption>
         <Caption textAlign="right">Cumulative</Caption>
       </Grid>
-      {data.map(([height, amount], index, arr) => {
-        const isReceived = height < state.currentHeight;
-        cumulativeAmount += amount;
-        const difference = parseInt(height) - state.currentHeight;
-        const timeInSeconds = difference * parseInt(state.averageBlockTime) * 1000;
+      {unlock_schedule.map(({ block_height, amount }, index, arr) => {
+        const isReceived = block_height < currentHeight;
+        cumulativeAmount += parseFloat(amount);
+        const difference = block_height - currentHeight;
+        const timeInSeconds = difference * 600 * 1000;
         const now = dayjs().valueOf();
         const relativeTime = dayjs(now + timeInSeconds).format(`MMM DD 'YY`);
 
@@ -164,7 +161,7 @@ const Table: React.FC = () => {
             position="relative"
           >
             <Box fontWeight={[500, 500, 'unset']} mb={['tight', 'tight', 'unset']}>
-              <Box display={['inline', 'inline', 'none']}>Block </Box>#{height}
+              <Box display={['inline', 'inline', 'none']}>Block </Box>#{block_height}
             </Box>
             <Box mb={['base', 'base', 'unset']}>{relativeTime}</Box>
             <Flex
@@ -184,7 +181,7 @@ const Table: React.FC = () => {
             <Caption my="tight" display={['block', 'block', 'none']}>
               Amount
             </Caption>
-            <StxAmount textAlign={['left', 'left', 'right']} amount={amount} />
+            <StxAmount textAlign={['left', 'left', 'right']} amount={parseFloat(amount)} />
             <Caption my="tight" mt="base" display={['block', 'block', 'none']}>
               Cumulative
             </Caption>

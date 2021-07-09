@@ -2,28 +2,19 @@ import * as React from 'react';
 
 import debounce from 'just-debounce-it';
 
-import { useRecoilState, useSetRecoilState } from 'recoil';
 import {
   searchQueryState,
-  searchResultItemState,
   searchExitingState,
   searchLoadingState,
   searchValueState,
-} from '@store/search';
-import { useItem } from '@common/hooks/search/use-item';
-import { usePrevious } from '@common/hooks/search/use-previous';
+} from '@store/recoil/search';
+import { useAtom } from 'jotai';
 
 export const useSearch = (ref: any, isLoadingTimeoutRef: any) => {
-  const [query, handleSetQuery] = useRecoilState(searchQueryState);
-  const [value, setValue] = useRecoilState(searchValueState);
-  const [exiting, handleSetExiting] = useRecoilState(searchExitingState);
-  const [isLoading, setIsLoading] = useRecoilState(searchLoadingState);
-  const { data: previous, isValidating: searchResultsValidating, setPrevious } = usePrevious();
-  const [item, itemValidating] = useItem();
-
-  const setItem = useSetRecoilState(
-    searchResultItemState(previous?.found && previous.result.entity_id)
-  );
+  const [query, handleSetQuery] = useAtom(searchQueryState);
+  const [value, setValue] = useAtom(searchValueState);
+  const [exiting, handleSetExiting] = useAtom(searchExitingState);
+  const [isLoading] = useAtom(searchLoadingState);
 
   const resetValue = () => {
     setValue('');
@@ -37,14 +28,12 @@ export const useSearch = (ref: any, isLoadingTimeoutRef: any) => {
 
   const handleClearState = React.useCallback(() => {
     resetValue();
-    setItem(null);
-    setPrevious(null);
-  }, [handleSetQuery, setItem, setPrevious, ref]);
+  }, [handleSetQuery, ref]);
 
   const debouncedSetQuery = React.useCallback(
     debounce((query: string | null) => {
       handleSetQuery(query);
-    }, 350),
+    }, 500),
     [handleSetQuery]
   );
 
@@ -52,42 +41,10 @@ export const useSearch = (ref: any, isLoadingTimeoutRef: any) => {
     (e: React.FormEvent<HTMLInputElement>) => {
       const v = e.currentTarget.value;
       setValue(v);
-      debouncedSetQuery(v === '' ? null : v);
+      debouncedSetQuery(v);
     },
     [debouncedSetQuery]
   );
-
-  const handleSetLoading = React.useCallback(() => {
-    const loading = itemValidating || searchResultsValidating;
-    if (!isLoading && loading) {
-      setIsLoading((v: any) => {
-        return true;
-      });
-    }
-  }, [itemValidating, searchResultsValidating, isLoading, setIsLoading]);
-
-  const handleSetLoadingFalse = React.useCallback(() => {
-    const loading = itemValidating || searchResultsValidating;
-    if (isLoading && !loading) {
-      setIsLoading((v: any) => {
-        return false;
-      });
-    }
-  }, [itemValidating, searchResultsValidating, isLoading, setIsLoading]);
-
-  React.useEffect(() => {
-    if ((itemValidating || searchResultsValidating) && !isLoading) {
-      handleSetLoading();
-    } else {
-      handleSetLoadingFalse();
-    }
-  }, [
-    itemValidating,
-    searchResultsValidating,
-    isLoading,
-    handleSetLoading,
-    isLoadingTimeoutRef.current,
-  ]);
 
   return {
     value,
@@ -101,7 +58,5 @@ export const useSearch = (ref: any, isLoadingTimeoutRef: any) => {
     handleSetExiting,
     exiting,
     isLoading,
-    previous,
-    item,
   };
 };

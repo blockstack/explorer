@@ -5,7 +5,7 @@ import React from 'react';
 import { StxInline } from '@components/icons/stx-inline';
 import { HeaderTextItem } from '@components/header-text-item';
 import { NetworkSwitcherItem } from '@components/network-switcher';
-import { SearchComponent } from '@components/search/search';
+import { SearchComponent } from '@features/search/search';
 import { MobileMenu } from '@components/mobile-menu';
 import { useModal } from '@common/hooks/use-modal';
 import { IconSearch } from '@tabler/icons';

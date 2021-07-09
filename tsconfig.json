@@ -18,6 +18,7 @@
       "@store/*": ["store/*"],
       "@store": ["store/index"],
       "@components/*": ["components/*"],
+      "@features/*": ["features/*"],
       "@pages/*": ["pages/*"],
       "@common/*": ["common/*"],
       "@models/*": ["models/*"],

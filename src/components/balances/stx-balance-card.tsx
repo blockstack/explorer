@@ -5,7 +5,6 @@ import { Caption, Text } from '@components/typography';
 
 import { Section } from '@components/section';
 import { border, microToStacks } from '@common/utils';
-import { ItemIcon } from '@components/item-icon';
 import { IconButton } from '@components/icon-button';
 import { IconQrcode, IconX } from '@tabler/icons';
 import { Tooltip } from '@components/tooltip';
@@ -15,6 +14,8 @@ import { StackingPercentage } from '@components/stacking';
 import vkQr from '@vkontakte/vk-qr';
 import { useModal } from '@common/hooks/use-modal';
 import { VestingAddressData } from '@pages/api/vesting/[address]';
+import { useAtomValue } from 'jotai/utils';
+import { accountInViewTokenOfferingData } from '@store/currently-in-view';
 
 export const BalanceItem = ({ balance, ...rest }: any) => {
   const parts = balance.split('.');
@@ -59,16 +60,13 @@ const QRcode: React.FC<{ principal: string } & BoxProps> = React.memo(({ princip
 interface StxBalancesProps {
   [key: string]: any;
 
-  unlocking: VestingAddressData;
+  unlocking?: VestingAddressData;
 }
 
-export const StxBalances: React.FC<StxBalancesProps> = ({
-  balances,
-  principal,
-  stackingBlock,
-  unlocking,
-}) => {
+export const StxBalances: React.FC<StxBalancesProps> = ({ balances, principal, stackingBlock }) => {
   const { handleOpenUnlockingScheduleModal } = useModal();
+  const tokenOfferingData = useAtomValue(accountInViewTokenOfferingData);
+
   const balance =
     typeof parseInt(balances?.stx?.balance) === 'number' ? parseInt(balances?.stx?.balance) : 0;
   const minerRewards =
@@ -78,15 +76,9 @@ export const StxBalances: React.FC<StxBalancesProps> = ({
   const locked =
     typeof parseInt(balances?.stx?.locked) === 'number' ? parseInt(balances?.stx?.locked) : 0;
 
-  const totalBalance =
-    unlocking && 'found' in unlocking && 'balance' in unlocking
-      ? microToStacks(locked + Number(unlocking.lockedBalance) + Number(unlocking.balance))
-      : microToStacks(balance);
-
-  const availableBalance =
-    unlocking && 'found' in unlocking && 'balance' in unlocking
-      ? microToStacks(unlocking.balance)
-      : microToStacks(balance - locked);
+  const tokenOfferingLocked = parseInt(tokenOfferingData?.total_locked || '0');
+  const totalBalance = microToStacks(balance + tokenOfferingLocked);
+  const availableBalance = microToStacks(balance - locked);
   const stackedBalance = microToStacks(locked);
   const minerRewardsBalance = microToStacks(minerRewards);
   const isStacking = locked > 0;
@@ -115,11 +107,7 @@ export const StxBalances: React.FC<StxBalancesProps> = ({
         <>
           <Box px="base-loose">
             <Flex
-              borderBottom={
-                isStacking || (unlocking && 'found' in unlocking && unlocking.found)
-                  ? border()
-                  : 'unset'
-              }
+              borderBottom={isStacking || !!tokenOfferingData ? border() : 'unset'}
               alignItems="center"
               py="loose"
             >
@@ -132,15 +120,11 @@ export const StxBalances: React.FC<StxBalancesProps> = ({
               </Stack>
             </Flex>
           </Box>
-          {isStacking || (unlocking && 'found' in unlocking && unlocking.found) ? (
+          {isStacking || !!tokenOfferingData ? (
             <Box px="base-loose">
               <Stack
                 borderBottom={
-                  isStacking ||
-                  minerRewards > 0 ||
-                  (unlocking && 'found' in unlocking && 'balance' in unlocking)
-                    ? border()
-                    : 'unset'
+                  isStacking || minerRewards > 0 || !!tokenOfferingData ? border() : 'unset'
                 }
                 spacing="tight"
                 py="loose"
@@ -154,9 +138,7 @@ export const StxBalances: React.FC<StxBalancesProps> = ({
             <>
               <Box px="base-loose">
                 <Stack
-                  borderBottom={
-                    unlocking && 'found' in unlocking && 'balance' in unlocking ? border() : 'unset'
-                  }
+                  borderBottom={!!tokenOfferingData ? border() : 'unset'}
                   spacing="tight"
                   py="loose"
                 >
@@ -166,14 +148,14 @@ export const StxBalances: React.FC<StxBalancesProps> = ({
               </Box>
             </>
           ) : null}
-          {unlocking && 'found' in unlocking && 'balance' in unlocking ? (
+          {!!tokenOfferingData ? (
             <Box px="base-loose">
               <Stack borderBottom={isStacking ? border() : undefined} spacing="tight" py="loose">
                 <Caption>Locked</Caption>
                 <Flex alignItems="baseline" justifyContent="space-between">
                   <BalanceItem
                     color={color('text-title')}
-                    balance={microToStacks(unlocking.lockedBalance)}
+                    balance={microToStacks(tokenOfferingData.total_locked)}
                   />
                   <Box
                     onClick={handleOpenUnlockingScheduleModal}

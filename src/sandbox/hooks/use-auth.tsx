@@ -9,7 +9,7 @@ import {
   userDataAtom,
   userSession,
 } from '@sandbox/store/sandbox';
-import { authResponseState } from '@store/auth';
+import { authResponseState } from '@store/recoil/auth';
 import type { AuthOptions, FinishedAuthData } from '@stacks/connect';
 import { IS_BROWSER } from '@common/constants';
 import { useRouter } from 'next/router';

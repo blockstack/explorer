@@ -6,6 +6,7 @@ import { TransactionDetails } from '@components/transaction-details';
 import { PoisonMicroblockTxs, TxData } from '@common/types/tx';
 import { Block } from '@stacks/stacks-blockchain-api-types';
 
+// TODO: make this real
 const PoisonMicroblockPage = ({ transaction }: TxData<PoisonMicroblockTxs> & { block?: Block }) => (
   <>
     <PageTop tx={transaction as any} />

@@ -1,6 +1,7 @@
 import {
   CoinbaseTransaction,
   ContractCallTransaction,
+  ContractInterfaceResponse,
   MempoolCoinbaseTransaction,
   MempoolContractCallTransaction,
   MempoolPoisonMicroblockTransaction,
@@ -11,7 +12,6 @@ import {
   TokenTransferTransaction,
   Transaction,
 } from '@stacks/stacks-blockchain-api-types';
-import { Contract } from '@models/contract.interface';
 
 export type TokenTransferTxs = TokenTransferTransaction | MempoolTokenTransferTransaction;
 export type CoinbaseTxs = CoinbaseTransaction | MempoolCoinbaseTransaction;
@@ -22,6 +22,24 @@ export type NonContractTxs = TokenTransferTxs | CoinbaseTxs | PoisonMicroblockTx
 
 interface Tx<T> {
   transaction: T;
+}
+
+export interface ContractResponse {
+  tx_id: string;
+  contract_id: string;
+  block_height: number;
+  source_code: string;
+  abi: string;
+  canonical: true;
+}
+
+export interface Contract {
+  tx_id: string;
+  contract_id: string;
+  block_height: number;
+  source_code: string;
+  abi: ContractInterfaceResponse;
+  canonical: true;
 }
 
 interface TxDataWithContract<T = Transaction> extends Tx<T> {

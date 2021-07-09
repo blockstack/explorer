@@ -1,15 +1,14 @@
+import React from 'react';
 import { BoxProps, Flex, FlexProps, Stack, color } from '@stacks/ui';
 import { Caption, Text, Title } from '@components/typography';
-import { MempoolTransaction } from '@stacks/stacks-blockchain-api-types';
+import { Transaction, MempoolTransaction } from '@stacks/stacks-blockchain-api-types';
 import { getTxTitle, toRelativeTime, truncateMiddle } from '@common/utils';
 import { forwardRefWithAs } from '@stacks/ui-core';
-import { getTransactionTypeLabel } from '@components/token-transfer/utils';
 
+import { getTransactionTypeLabel } from '@components/token-transfer/utils';
 import { ArrowRightIcon } from '@components/icons/arrow-right';
 import { Link } from '@components/link';
 import NextLink from 'next/link';
-import React from 'react';
-import { Transaction } from '@models/transaction.interface';
 import { getTxTypeIcon, ItemIcon } from '@components/item-icon';
 import { useHoverableState } from '@components/hoverable';
 
@@ -32,7 +31,7 @@ export interface TxItemProps extends FlexProps {
 
 const getRelativeTimestamp = (tx: Transaction | MempoolTransaction) => {
   const date =
-    typeof (tx as any).burn_block_time !== 'undefined'
+    typeof (tx as any).burn_block_time !== 'undefined' && (tx as any).burn_block_time !== -1
       ? toRelativeTime((tx as any).burn_block_time * 1000)
       : (tx as any).receipt_time
       ? toRelativeTime((tx as any).receipt_time * 1000)

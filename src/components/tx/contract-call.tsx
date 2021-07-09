@@ -1,33 +1,40 @@
 import * as React from 'react';
 import { Stack } from '@stacks/ui';
-import { Block, ContractCallTransaction } from '@stacks/stacks-blockchain-api-types';
+
+import { ContractCallTransaction } from '@stacks/stacks-blockchain-api-types';
+
 import { PageTop } from '@components/page';
 import { TransactionDetails } from '@components/transaction-details';
 import { ContractSource } from '@components/contract-source';
 import { PostConditions } from '@components/post-conditions';
 import { Events } from '@components/tx-events';
-import { ContractCallTxs, TxData } from '@common/types/tx';
 import { ContractDetails } from '@components/contract-details';
 import { BtcAnchorBlockCard } from '@components/btc-anchor-card';
 import { PagePanes } from '@components/page-panes';
 import { FunctionSummarySection } from '@components/function-summary/function-summary';
+import {
+  useAccountInViewBalances,
+  useAccountInViewTransactions,
+  useBlockInView,
+  useContractInfoInView,
+  useContractSourceInView,
+  useTransactionInView,
+} from '../../hooks/currently-in-view-hooks';
 
-const ContractCallPage = ({
-  transaction,
-  source,
-  block,
-  btc,
-}: TxData<ContractCallTxs> & { block?: Block; btc: null | string }) => {
+const ContractCallPage = () => {
+  const transaction = useTransactionInView();
+  const block = useBlockInView();
+  const source = useContractSourceInView();
+  const info = useContractInfoInView();
+  const btc = null;
+
+  if (!transaction || transaction.tx_type !== 'contract_call') return null;
   const isPending = transaction.tx_status === 'pending';
   return (
     <>
       <PageTop tx={transaction as any} />
       <PagePanes
-        fullWidth={
-          source?.contract?.contract_id
-            ? false
-            : transaction.tx_status === 'pending' || block === null
-        }
+        fullWidth={info || !!source ? false : transaction.tx_status === 'pending' || block === null}
       >
         <Stack spacing="extra-loose">
           <TransactionDetails transaction={transaction} />
@@ -44,19 +51,19 @@ const ContractCallPage = ({
             conditions={transaction.post_conditions}
             mode={transaction.post_condition_mode}
           />
-          {source.contract && (
+          {source && (
             <ContractSource
-              sourceTx={source.contract.contract_id}
-              source={source.contract.source_code}
+              sourceTx={transaction.contract_call.contract_id}
+              source={source}
               contractCall={transaction.contract_call}
             />
           )}
         </Stack>
         <Stack spacing="extra-loose">
-          {source?.contract?.contract_id && (
+          {info && (
             <ContractDetails
-              contractId={source?.contract?.contract_id}
-              contractInterface={source.contract}
+              contractId={transaction.contract_call.contract_id}
+              contractInterface={info}
             />
           )}
           {!isPending && block && <BtcAnchorBlockCard block={block} />}

@@ -2,12 +2,11 @@ import React from 'react';
 import { Box, BoxProps, color, Grid, GridProps } from '@stacks/ui';
 import { border } from '@common/utils';
 import { CodeIcon } from '@components/icons/code';
-import { Transaction } from '@models/transaction.interface';
 import { ContractCallIcon } from '@components/icons/contract-call';
 import { StxInline } from '@components/icons/stx-inline';
 import { WalletIcon } from '@components/icons/wallet';
 import { AppsIcon } from '@components/icons/apps';
-import { MempoolTransaction } from '@stacks/stacks-blockchain-api-types';
+import { MempoolTransaction, Transaction } from '@stacks/stacks-blockchain-api-types';
 
 export const getTxTypeIcon = (txType: Transaction['tx_type']): React.FC<BoxProps> => {
   let Icon = (p: any) => <StxInline {...p} strokeWidth={1.5} />;

@@ -4,9 +4,9 @@ import { useModal } from '@common/hooks/use-modal';
 import { useNetworkMode } from '@common/hooks/use-network-mode';
 import { IS_BROWSER } from '@common/constants';
 import { NetworkMode, NetworkModes } from '@common/types/network';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { networkSwitchingState } from '@store/network';
-import { authResponseState } from '@store/auth';
+
+import { networkSwitchingState } from '@store/recoil/network';
+import { useAtomValue } from 'jotai/utils';
 
 type ChainMode = NetworkMode | undefined;
 type SetChainMode = (mode: ChainMode) => Promise<void>;
@@ -14,14 +14,9 @@ type SetChainMode = (mode: ChainMode) => Promise<void>;
 // kind of like useState, but for the query param state
 export const useChainMode = (): [ChainMode, SetChainMode] => {
   const router = useRouter();
-  const setAuthResponse = useSetRecoilState(authResponseState);
 
   const setChainMode = async (chain: ChainMode) => {
     const params = router.query || {};
-    if (router.query.authResponse) {
-      setAuthResponse(params.authResponse as string);
-      delete params.authResponse;
-    }
 
     if (router.query.chain) {
       delete params.chain;
@@ -49,7 +44,7 @@ export const useChainModeEffect = () => {
   const { handleOpenDifferentNetworkModal } = useModal();
   const networkMode = useNetworkMode();
   const [chainMode, setChainMode] = useChainMode();
-  const networkModeChangeState = useRecoilValue(networkSwitchingState);
+  const networkModeChangeState = useAtomValue(networkSwitchingState);
 
   const isRegtest = chainMode === NetworkModes.Regtest;
   const isTestnet = chainMode === NetworkModes.Testnet;

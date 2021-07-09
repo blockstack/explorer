@@ -2,9 +2,8 @@ import {
   AddressBalanceResponse,
   ContractCallTransaction,
   MempoolTransaction,
+  Transaction,
 } from '@stacks/stacks-blockchain-api-types';
-
-import { Transaction } from '@models/transaction.interface';
 
 export const hasTokenBalance = (balances?: AddressBalanceResponse) => {
   if (!balances) return false;

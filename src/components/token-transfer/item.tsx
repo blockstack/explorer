@@ -2,7 +2,17 @@
 // todo: remove
 import * as React from 'react';
 import { Ref } from 'react';
-import { Box, Flex, Stack, FlexProps, BoxProps, Grid, GridProps, color } from '@stacks/ui';
+import {
+  Box,
+  Flex,
+  Stack,
+  FlexProps,
+  BoxProps,
+  Grid,
+  GridProps,
+  color,
+  DynamicColorCircle,
+} from '@stacks/ui';
 import { Truncate } from '@components/truncated';
 import { microToStacks, startPad, validateStacksAddress } from '@common/utils';
 import { Text } from '@components/typography';
@@ -29,7 +39,6 @@ import { StxNexus } from '@components/icons/stx-nexus';
 
 import { CodeIcon } from '@components/icons/code';
 import { ChevronDown } from '@components/icons/chevron-down';
-import { DynamicColorCircle } from '@components/dynamic-color-circle';
 import { IconButton } from '@components/icon-button';
 import { AddressLink } from '@components/links';
 import { ExternalLinkIcon } from '@components/icons/external-link';

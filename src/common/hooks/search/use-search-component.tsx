@@ -2,10 +2,11 @@ import * as React from 'react';
 import { useRecentlyViewedItems } from '@common/hooks/search/use-recent-items';
 import { useSearch } from '@common/hooks/search/use-search';
 import { useHover } from 'web-api-hooks';
-import { useRecoilFocus } from '@common/hooks/use-recoil-focus';
-import { searchDropdownVisibilitySelector, searchFocusedState } from '@store/search';
-import { useRecoilValue } from 'recoil';
+import { useAtomFocus } from '@common/hooks/use-atom-focus';
+import { searchDropdownVisibilitySelector, searchFocusedState } from '@store/recoil/search';
+
 import { useSearchFocus } from '@common/hooks/search/use-search-focus';
+import { useAtomValue } from 'jotai/utils';
 
 type Variant = 'default' | 'small';
 
@@ -21,16 +22,14 @@ export const useSearchComponent = ({
 }) => {
   const { recentItemsArray } = useRecentlyViewedItems();
   const [isHovered, bindHover] = useHover();
-  const [isFocused] = useRecoilFocus(searchFocusedState);
+  const [isFocused] = useAtomFocus(searchFocusedState);
   const [_, __, { removeFocus }] = useSearchFocus();
-  const isVisible = useRecoilValue(searchDropdownVisibilitySelector);
+  const isVisible = useAtomValue(searchDropdownVisibilitySelector);
   const {
     query,
     handleUpdateQuery,
     handleClearState,
     isLoading,
-    previous,
-    item,
     exiting,
     handleSetExiting,
     value,
@@ -42,8 +41,6 @@ export const useSearchComponent = ({
   const inputLeftOffset = isSmall ? '38px' : '50px';
   const inputRightOffset = spinnerVisible ? '92px' : '60px';
   const defaultHeight = isSmall ? '38px' : '64px';
-
-  const hasSearchResult = (previous && !previous.found) || !!item;
 
   const hasRecentItems = !!recentItemsArray?.length;
 
@@ -69,7 +66,6 @@ export const useSearchComponent = ({
     inputLeftOffset,
     inputRightOffset,
     defaultHeight,
-    hasSearchResult,
     hasRecentItems,
     isHovered,
     isFocused,

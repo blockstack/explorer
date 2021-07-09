@@ -161,7 +161,7 @@ export const TransactionList: React.FC<
     showCoinbase,
     ...rest
   }) => {
-    const { showPending, showFailed, types } = useFilterState('txList', showCoinbase);
+    const { showPending, showFailed, types } = useFilterState('txList');
 
     const filteredTransactions = transactions.filter((tx, index) =>
       limit && showPending && mempool.length > 0 ? index < limit - mempool.length : true

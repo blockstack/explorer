@@ -5,8 +5,8 @@ import { Text, Title } from '@components/typography';
 import { useModal } from '@common/hooks/use-modal';
 import { MODALS } from '@common/constants';
 import { useSearchComponent } from '@common/hooks/search/use-search-component';
-import { SearchBox } from '@components/search/search-box';
-import { SearchResultsCard } from '@components/search/search-results-card';
+import { SearchBox } from '@features/search/search-field/search-box';
+import { SearchResultsCard } from '@features/search/dropdown/search-results-card';
 import { useLockBodyScroll } from '@common/hooks/use-lock-body-scroll';
 import { MetaverseBg } from '@components/metaverse-bg';
 import { border } from '@common/utils';
@@ -19,7 +19,7 @@ export const SearchModal: React.FC = () => {
   const inputRef = React.useRef(null);
   const timeoutRef = React.useRef<number | null>(null);
 
-  const { hasRecentItems, isLoading, hasSearchResult, handleClearResults } = useSearchComponent({
+  const { hasRecentItems, isLoading, handleClearResults } = useSearchComponent({
     variant: 'default',
     inputRef,
     timeoutRef,
@@ -27,7 +27,7 @@ export const SearchModal: React.FC = () => {
 
   const isOpen = modal === MODALS.SEARCH;
 
-  const results = hasRecentItems || hasSearchResult;
+  const results = hasRecentItems;
   useLockBodyScroll(isOpen, true);
   return (
     <Fade in={isOpen}>

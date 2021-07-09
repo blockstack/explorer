@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { TransactionEvent, TransactionEventAssetType } from '@stacks/stacks-blockchain-api-types';
 import { Section } from '@components/section';
-import { Box, Grid, Flex, color, Stack, FlexProps } from '@stacks/ui';
-import { DynamicColorCircle } from '@components/dynamic-color-circle';
+import { Box, Grid, Flex, color, Stack, FlexProps, DynamicColorCircle } from '@stacks/ui';
 import { IconAlignLeft, IconArrowRight, IconPlus, IconTrash } from '@tabler/icons';
 import { StxInline } from '@components/icons/stx-inline';
 import {
@@ -17,9 +16,6 @@ import { Caption, Link, Title } from '@components/typography';
 import { Circle } from '@components/circle';
 import { SenderRecipient } from '@components/addresses';
 import { AddressLink } from '@components/links';
-import { useFetchEvents } from '@common/hooks/data/use-fetch-events';
-import { useApiServer } from '@common/hooks/use-api';
-import { useLoading } from '@common/hooks/use-loading';
 
 export const getTicker = (name: string) => {
   if (name.includes('-')) {
@@ -279,57 +275,13 @@ const Item: React.FC<{ event: TransactionEvent; isLast?: boolean }> = ({ event, 
   );
 };
 
-const EventsList = ({
-  events: initialData,
-  txId,
-}: {
-  txId: string;
-  events: TransactionEvent[];
-}) => {
-  const apiServer = useApiServer();
-  const { data, hasNextPage, fetchNextPage } = useFetchEvents({
-    initialData: {
-      pageParams: [undefined],
-      pages: [initialData],
-    },
-    txId,
-    apiServer,
-    key: `EVENTS__${txId}`,
-  });
-
-  const { isLoading, doFinishLoading, doStartLoading } = useLoading();
-
-  const handleLoadMore = useCallback(async () => {
-    doStartLoading();
-    await fetchNextPage();
-    doFinishLoading();
-  }, [doStartLoading, fetchNextPage, doFinishLoading]);
-
+const EventsList = ({ events }: { txId: string; events: TransactionEvent[] }) => {
+  // TODO: paginated data
   return (
     <Box px="loose">
-      {data.pages.map((events: TransactionEvent[], pageIndex: number) =>
-        events.map((event, index, arr) => (
-          <Item
-            key={index}
-            event={event}
-            isLast={pageIndex === data?.pages?.length - 1 && index === arr.length - 1}
-          />
-        ))
-      )}
-      {hasNextPage ? (
-        <Grid
-          as="a"
-          borderTop={border()}
-          px="base"
-          py="base"
-          placeItems="center"
-          _hover={{ color: color('text-title'), cursor: 'pointer' }}
-          onClick={handleLoadMore}
-          color={color('text-caption')}
-        >
-          <Caption color="currentColor">{isLoading ? 'Loading...' : 'Load more'}</Caption>
-        </Grid>
-      ) : null}
+      {events.map((event, index, arr) => (
+        <Item key={index} event={event} isLast={index === arr.length - 1} />
+      ))}
     </Box>
   );
 };

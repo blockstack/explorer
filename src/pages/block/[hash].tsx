@@ -2,30 +2,38 @@ import * as React from 'react';
 import { Block, CoinbaseTransaction, Transaction } from '@stacks/stacks-blockchain-api-types';
 import { Box, Flex } from '@stacks/ui';
 import { Title } from '@components/typography';
-import { queryWith0x, validateTxId } from '@common/utils';
+import { validateTxId } from '@common/utils';
 import { Rows } from '@components/rows';
-import { NextPage, NextPageContext } from 'next';
-import { fetchBlock } from '@common/api/blocks';
+import { NextPage } from 'next';
+
 import { Section } from '@components/section';
 import { Timestamp } from '@components/timestamp';
-import { FetchTransactionResponse, fetchTx, FetchTxResponse } from '@common/api/transactions';
 
-import { getServerSideApiServer } from '@common/api/utils';
 import { Meta } from '@components/meta-head';
 import { PagePanes } from '@components/page-panes';
 import { BlockNotFound } from '@components/block-not-found';
 import { BtcAnchorBlockCard } from '@components/btc-anchor-card';
 import { TransactionList, TxList } from '@components/transaction-list';
+import { withInitialQueries } from '@common/with-initial-queries';
+import {
+  getBlockHashFromCtx,
+  getBlockPageQueries,
+  getBlockPageQueryProps,
+} from '@common/page-queries/block-hash';
+import {
+  useBlockCurrentlyInView,
+  useBlockTxsCurrentlyInView,
+} from '../../hooks/currently-in-view-hooks';
 
 interface BlockSinglePageData {
   hash: string;
-  block: Block;
-  transactions?: FetchTransactionResponse[];
   error?: boolean;
 }
 
-const BlockSinglePage: NextPage<BlockSinglePageData> = ({ block, error, hash, transactions }) => {
-  if (error) {
+const BlockSinglePage: NextPage<BlockSinglePageData> = ({ error, hash }) => {
+  const block = useBlockCurrentlyInView();
+  const transactions = useBlockTxsCurrentlyInView();
+  if (error || !block || !transactions) {
     return (
       <>
         <Meta title="Block hash not found" />
@@ -99,24 +107,15 @@ const BlockSinglePage: NextPage<BlockSinglePageData> = ({ block, error, hash, tr
   );
 };
 
-export async function getServerSideProps(
-  ctx: NextPageContext
-): Promise<{ props: BlockSinglePageData }> {
-  const { query } = ctx;
-  const hash = query?.hash ? queryWith0x(query?.hash?.toString()) : '';
-  try {
-    const apiServer = await getServerSideApiServer(ctx);
-    const data = await fetchBlock(apiServer)(hash);
-    const txs: Promise<FetchTxResponse>[] = [];
-    data.txs.forEach((txid: string) => txs.push(fetchTx(apiServer)(txid)));
-    const transactions = await Promise.all(txs);
-
-    return {
-      props: { hash, block: data, transactions: transactions as FetchTransactionResponse[] },
-    };
-  } catch (e) {
-    return { props: { hash, error: true } } as any;
-  }
-}
-
-export default BlockSinglePage;
+BlockSinglePage.getInitialProps = ctx => {
+  const hash = getBlockHashFromCtx(ctx);
+  return {
+    hash,
+    inView: { type: 'block', payload: hash },
+    error: false,
+  };
+};
+export default withInitialQueries<Block, BlockSinglePageData>(BlockSinglePage)(
+  getBlockPageQueries,
+  getBlockPageQueryProps
+);

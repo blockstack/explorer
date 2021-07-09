@@ -1,7 +1,7 @@
-import { useRecoilValue } from 'recoil';
-import { networkCurrentUrlSelector } from '@store/network';
+import { useAtomValue } from 'jotai/utils';
+import { networkUrlState } from '@store/network';
 
 export const useApiServer = (): string => {
-  const network = useRecoilValue(networkCurrentUrlSelector);
+  const network = useAtomValue(networkUrlState);
   return network as string;
 };

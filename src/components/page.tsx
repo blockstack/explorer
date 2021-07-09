@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, FlexProps, transition, color, useColorMode } from '@stacks/ui';
+import { Box, Flex, FlexProps, color } from '@stacks/ui';
 import { css, Theme } from '@stacks/ui-core';
 import dayjs from 'dayjs';
 
@@ -10,19 +10,21 @@ import { MetaverseBg } from '@components/metaverse-bg';
 
 import { TitleProps, TransactionTitle } from '@components/transaction-title';
 import { Alert } from '@components/alert';
-import { Transaction } from '@stacks/stacks-blockchain-api-types';
+
 import {
   SITE_NOTICE_BANNER_LABEL,
   SITE_NOTICE_BANNER_MESSAGE,
   SITE_NOTICE_ENABLED,
 } from '@common/constants';
 import { useNetworkMode } from '@common/hooks/use-network-mode';
+import type { MempoolTransaction, Transaction } from '@stacks/stacks-blockchain-api-types';
 
 type PageProps = {
   notice?: { label?: string; message?: string };
   fullWidth?: boolean;
-  tx?: Transaction;
+  tx?: MempoolTransaction | Transaction;
 } & FlexProps;
+
 type PageWrapperProps = {
   isHome?: boolean;
   fullWidth?: boolean;

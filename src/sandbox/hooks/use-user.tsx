@@ -1,40 +1,14 @@
 import * as React from 'react';
-
 import { useAuthState } from '@sandbox/hooks/use-auth';
-import useSWR from 'swr';
-import { useApiServer } from '@common/hooks/use-api';
-import { fetchAllAccountData } from '@common/api/accounts';
 import { UserData } from '@stacks/auth';
-import {
+import type {
   AddressBalanceResponse,
   MempoolTransaction,
   TransactionResults,
 } from '@stacks/stacks-blockchain-api-types';
 import { useNetworkMode } from '@common/hooks/use-network-mode';
-
-interface AccountDataResponse {
-  balances: AddressBalanceResponse;
-  transactions: TransactionResults;
-  pendingTransactions: MempoolTransaction[] | [];
-}
-
-const useFetchAccountData = (
-  principal: string,
-  options?: {
-    suspense?: boolean;
-  }
-) => {
-  const apiServer = useApiServer();
-
-  const fetcher = async (principal: string): Promise<AccountDataResponse> =>
-    fetchAllAccountData(apiServer)({ principal }) as Promise<AccountDataResponse>;
-
-  const data = useSWR<AccountDataResponse>(principal, fetcher, {
-    suspense: options?.suspense,
-  });
-
-  return data;
-};
+import { useAtomValue } from 'jotai/utils';
+import { accountBalancesResponseState, accountTransactionsState } from '@store/accounts';
 
 export const useUser = (options?: {
   suspense?: boolean;
@@ -53,19 +27,22 @@ export const useUser = (options?: {
   const username = userData?.username;
   const profile = userData?.profile;
 
-  const { data, mutate } = useFetchAccountData(principal, options);
+  const balances = useAtomValue(accountBalancesResponseState(principal));
+  const transactions = useAtomValue(accountTransactionsState(principal));
+  const pendingTransactions: any = { results: [] };
 
   const hasTransactions = !!(
-    data?.transactions?.results?.length || data?.pendingTransactions?.length
+    (transactions && transactions?.pages?.[0].total > 0) ||
+    pendingTransactions?.results.length
   );
   return {
     principal,
     username,
     profile,
-    transactions: data?.transactions?.results,
-    balances: data?.balances,
-    pendingTransactions: data?.pendingTransactions,
-    refreshPendingTransactions: mutate,
+    transactions: transactions?.pages?.[0].results,
+    balances,
+    pendingTransactions,
+    refreshPendingTransactions: () => console.log('todo'),
     hasTransactions,
     ...userData,
   };

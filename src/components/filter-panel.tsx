@@ -9,12 +9,12 @@ import { Tag } from '@components/tags';
 import CloseIcon from 'mdi-react/CloseIcon';
 import { useHover } from 'use-events';
 import CheckboxMarkedCircleOutlineIcon from 'mdi-react/CheckboxMarkedCircleOutlineIcon';
-import { TransactionType } from '@models/transaction.interface';
 import { blue } from '@components/button';
 import { FilterIcon } from '@components/icons/filter';
 import { Badge } from '@components/badge';
 import { Text } from '@components/typography';
 import { useFilterState } from '@common/hooks/use-filter-state';
+import { TransactionType } from '@common/constants';
 
 const FILTERABLE_TYPES = [
   TransactionType.SMART_CONTRACT,
@@ -69,7 +69,7 @@ export const FilteredMessage: React.FC<{ filterKey: 'sandbox' | 'txList' } & Gri
 const CheckableElement = ({ type, value: toggled, onClick, ...rest }: any) => {
   const [isHovered, bind] = useHover();
   const handleClick = () => {
-    onClick?.(type, !toggled);
+    onClick?.([type, !toggled]);
   };
 
   const Icon = toggled ? CheckboxMarkedCircleOutlineIcon : CheckboxBlankCircleOutlineIcon;
