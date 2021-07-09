@@ -1,8 +1,14 @@
 import { atom, WritableAtom } from 'jotai';
 import { transactionSingleState, TransactionsListResponse } from '@store/transactions';
+import { microblocksSingleState } from '@store/microblocks';
 import { blocksSingleState } from '@store/blocks';
 import { contractInfoState, contractInterfaceState, contractSourceState } from '@store/contracts';
-import type { MempoolTransaction, Transaction, Block } from '@stacks/stacks-blockchain-api-types';
+import type {
+  MempoolTransaction,
+  Transaction,
+  Block,
+  Microblock,
+} from '@stacks/stacks-blockchain-api-types';
 import {
   accountBalancesResponseState,
   accountInfoState,
@@ -23,6 +29,7 @@ export type InViewTypes =
   | 'contract_id'
   | 'address'
   | 'transactions'
+  | 'microblock'
   | 'blocks'
   | 'block';
 
@@ -92,12 +99,37 @@ export const contractInfoInViewState = atom(get => {
   }
 });
 
+export const currentlyInViewMicroblockHash = atom<string | undefined>(get => {
+  const inView = get(currentlyInViewState);
+  if (inView) {
+    if (inView.type === 'microblock') return inView.payload;
+  }
+  return undefined;
+});
+
 export const currentlyInViewBlockHash = atom<string | undefined>(get => {
   const inView = get(currentlyInViewState);
   if (inView) {
     if (inView.type === 'block') return inView.payload;
   }
   return undefined;
+});
+
+export const microblockInView = atom<Microblock | undefined>(get => {
+  const microblockHash = get(currentlyInViewMicroblockHash);
+  return microblockHash ? get(microblocksSingleState(microblockHash)) : undefined;
+});
+
+export const microblockInViewBlock = atom<Block | undefined>(get => {
+  const microblock = get(microblockInView);
+  if (!microblock) return;
+  return get(blocksSingleState(microblock.block_hash));
+});
+
+export const microblockInViewTransactions = atom<Transaction[] | undefined>(get => {
+  const microblock = get(microblockInView);
+  if (!microblock) return;
+  return microblock.txs.map(txid => get(transactionSingleState(txid))) as Transaction[];
 });
 
 export const blockInView = atom<Block | undefined>(get => {

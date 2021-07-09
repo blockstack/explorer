@@ -34,9 +34,11 @@ export const BlockItem: React.FC<{ block: Block; index: number; length: number }
                 </Title>
               </Flex>
               <Caption display="block">
-                {addSepBetweenStrings([
-                  `${block?.txs?.length} ${pluralize('transactions', block?.txs?.length)}`,
-                ])}
+                {'Anchor block' +
+                  ' · ' +
+                  addSepBetweenStrings([
+                    `${block.txs.length} ${pluralize('transactions', block.txs.length)}`,
+                  ])}
               </Caption>
             </Stack>
           </Stack>

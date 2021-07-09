@@ -86,7 +86,6 @@ const AddressArea = React.memo(
       }
       return (
         <Stack flexWrap="wrap" isInline spacing="extra-tight" {...({ as: 'span', ...rest } as any)}>
-          <Caption display={['none', 'none', 'none', 'block']}>from</Caption>
           <PrincipalLink principal={tx.sender_address} />
           <Flex as="span" color={color('text-caption')}>
             <ArrowRightIcon strokeWidth="1.5" size="15px" />
@@ -98,14 +97,14 @@ const AddressArea = React.memo(
     if (tx.tx_type === 'contract_call') {
       return (
         <Caption>
-          by <PrincipalLink principal={tx.sender_address} />
+          By <PrincipalLink principal={tx.sender_address} />
         </Caption>
       );
     }
     if (tx.tx_type === 'smart_contract') {
       return (
         <Caption>
-          by <PrincipalLink principal={tx.sender_address} />
+          By <PrincipalLink principal={tx.sender_address} />
         </Caption>
       );
     }
@@ -190,19 +189,21 @@ const LargeVersion = React.memo(
           <Stack alignItems="flex-end" textAlign="right" as="span" spacing="tight">
             <Flex justifyContent="flex-end" alignItems="flex-end" flexWrap="wrap">
               {tx.tx_status === 'pending' ? (
-                <Caption fontWeight="bold" as="span" color={color('feedback-alert')}>
+                <Caption mr="6px" as="span">
                   Pending
                 </Caption>
               ) : null}
 
               {tx.tx_status !== 'pending' && tx.tx_status !== 'success' ? (
-                <Caption fontWeight="bold" mr="tight" as="span" color={color('feedback-error')}>
+                <Caption mr="6px" as="span" color={color('feedback-error')}>
                   Failed
                 </Caption>
               ) : null}
-              <Timestamp tx={tx} />
+              {tx.tx_status !== 'success' ? '·' : null}
+              <Caption mt="1px" ml="6px">
+                {truncateMiddle(tx.tx_id, 4)}
+              </Caption>
             </Flex>
-            <Caption mt="1px">{truncateMiddle(tx.tx_id, 4)}</Caption>
           </Stack>
         ) : null}
       </>

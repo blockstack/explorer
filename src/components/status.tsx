@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import type { FlexProps } from '@stacks/ui';
+import { Box, color, FlexProps } from '@stacks/ui';
 
 import { keyframes } from '@emotion/react';
 import { css, Theme } from '@stacks/ui-core';
@@ -9,6 +9,7 @@ import { Badge } from './badge';
 import { CheckIcon } from './icons/check';
 import { LoaderQuarter } from './icons/loader-quarter';
 import { AlertCircleIcon } from './icons/alert-circle';
+import { MicroblockIcon } from './icons/microblock';
 
 const keyframesRotate = keyframes`
   0% {
@@ -33,13 +34,17 @@ export const Pending = ({ speed = 0.9, ...p }: any) => (
     {...p}
   />
 );
+
 export type Statuses =
+  | 'success_microblock'
+  | 'success_anchor_block'
   | 'success'
   | 'pending'
   | 'failed' // todo: remove
   | 'abort_by_response'
   | 'abort_by_post_condition';
 
+// TODO: This is unused?
 const colorMap = {
   pending: 'ink.900',
   success: '#008832',
@@ -49,16 +54,20 @@ const colorMap = {
 };
 
 const labelMap = {
-  pending: 'Pending',
+  success_microblock: 'Included in microblock',
+  success_anchor_block: 'Confirmed in anchor block',
   success: 'Confirmed',
+  pending: 'Pending',
   failed: 'Failed',
   abort_by_response: 'Failed',
   abort_by_post_condition: 'Failed',
 };
 
 const iconMap = {
-  pending: Pending,
+  success_microblock: () => <MicroblockIcon fill="white" />,
+  success_anchor_block: CheckIcon,
   success: CheckIcon,
+  pending: Pending,
   failed: AlertCircleIcon,
   abort_by_response: AlertCircleIcon,
   abort_by_post_condition: AlertCircleIcon,
@@ -79,8 +88,8 @@ export const Status: React.FC<StatusProps> = ({ status, ...rest }) => {
       maxHeight="24px"
       {...rest}
     >
-      <IconComponent strokeWidth="2" mr="extra-tight" size="16px" color="currentColor" />
-      {label}
+      <IconComponent strokeWidth="2" size="16px" color="currentColor" />
+      <Box ml="extra-tight">{label}</Box>
     </Badge>
   );
 };

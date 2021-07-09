@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Box, BoxProps, Stack, StackProps } from '@stacks/ui';
-import { Status } from '@components/status';
+import { Status, Statuses } from '@components/status';
 import { Tag, TagProps } from '@components/tags';
 import { Title } from '@components/typography';
 
@@ -34,13 +34,15 @@ const Tags = ({
     />
   );
 
+export type SuccessStatuses = 'success_microblock' | 'success_anchor_block';
+
 const TitleDetail = ({
   status,
   type,
   contractName,
   ...rest
 }: TitleProps & {
-  status: Transaction['tx_status'] | MempoolTransaction['tx_status'];
+  status: Transaction['tx_status'] | MempoolTransaction['tx_status'] | SuccessStatuses;
   type: Transaction['tx_type'] | MempoolTransaction['tx_type'];
 } & BoxProps) => (
   <Box {...rest}>
@@ -68,11 +70,22 @@ export const getTxTitle = (transaction: Transaction | MempoolTransaction) => {
   }
 };
 
-export const TransactionTitle = ({ contractName, tx, ...rest }: TitleProps & StackProps) => (
-  <Stack spacing="base" {...rest}>
-    <Title as="h1" fontSize="36px" color="white" mt="72px">
-      {getTxTitle(tx)}
-    </Title>
-    <TitleDetail tx={tx} status={tx.tx_status} type={tx.tx_type} />
-  </Stack>
-);
+export const TransactionTitle = ({ contractName, tx, ...rest }: TitleProps & StackProps) => {
+  let txStatus: Statuses;
+  if (tx.tx_status === 'success' && !!tx.microblock_hash) {
+    txStatus = 'success_microblock';
+  } else if (tx.tx_status === 'success' && !tx.microblock_hash) {
+    txStatus = 'success_anchor_block';
+  } else {
+    txStatus = tx.tx_status;
+  }
+
+  return (
+    <Stack spacing="base" {...rest}>
+      <Title as="h1" fontSize="36px" color="white" mt="72px">
+        {getTxTitle(tx)}
+      </Title>
+      <TitleDetail tx={tx} status={txStatus} type={tx.tx_type} />
+    </Stack>
+  );
+};

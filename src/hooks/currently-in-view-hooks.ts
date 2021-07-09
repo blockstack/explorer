@@ -14,6 +14,9 @@ import {
   currentlyInViewState,
   currentlyInViewTxId,
   getAccountInViewTransactionsState,
+  microblockInView,
+  microblockInViewBlock,
+  microblockInViewTransactions,
   transactionInViewState,
   transactionTypeInViewState,
 } from '@store/currently-in-view';
@@ -66,6 +69,18 @@ export function useAccountInViewBalances() {
 
 export function useAccountInViewStxBalance() {
   return useAtomValue(accountInViewBalances);
+}
+
+export function useMicroblockCurrentlyInView() {
+  return useAtomValue(microblockInView);
+}
+
+export function useMicroblockBlockCurrentlyInView() {
+  return useAtomValue(microblockInViewBlock);
+}
+
+export function useMicroblockTxsCurrentlyInView() {
+  return useAtomValue(microblockInViewTransactions);
 }
 
 export function useBlockCurrentlyInView() {

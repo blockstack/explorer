@@ -1,4 +1,4 @@
-import { HIRO_HEADERS, withApiServer } from '@common/constants';
+import { HIRO_HEADERS, MICROBLOCKS_ENABLED, withApiServer } from '@common/constants';
 
 export const fetcher = (input: RequestInfo, init: RequestInit = {}) => {
   const initHeaders = init.headers || {};
@@ -7,6 +7,13 @@ export const fetcher = (input: RequestInfo, init: RequestInit = {}) => {
     ...init,
     headers: { ...initHeaders, ...HIRO_HEADERS },
   });
+};
+
+export const appendUrlParam = (url: string, key: string, value: string) => {
+  const [baseUrl, searchParams] = url.split('?');
+  const urlSearchParams = new URLSearchParams(searchParams);
+  urlSearchParams.append(key, value);
+  return baseUrl + '?' + urlSearchParams.toString();
 };
 
 export const fetchFromApi =
@@ -20,7 +27,8 @@ export const fetchFromApi =
 export const fetchFromSidecar =
   (apiServer: string) =>
   async (path: string, opts = {}) => {
-    return fetcher(withApiServer(apiServer)('/extended/v1' + path), {
+    const newPath = MICROBLOCKS_ENABLED ? appendUrlParam(path, 'unanchored', 'true') : path;
+    return fetcher(withApiServer(apiServer)('/extended/v1' + newPath), {
       ...opts,
     });
   };

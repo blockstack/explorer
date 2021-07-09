@@ -39,19 +39,6 @@ export const CodeIcon: React.FC<BoxProps> = props => (
   </Box>
 );
 
-export const ClockIcon: React.FC<BoxProps> = props => (
-  <Box {...props}>
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10.5 6C10.5 8.48528 8.48528 10.5 6 10.5C3.51472 10.5 1.5 8.48528 1.5 6C1.5 3.51472 3.51472 1.5 6 1.5C8.48528 1.5 10.5 3.51472 10.5 6ZM12 6C12 9.31371 9.31371 12 6 12C2.68629 12 0 9.31371 0 6C0 2.68629 2.68629 0 6 0C9.31371 0 12 2.68629 12 6ZM5.25 6.5V3H6.75V5.67239L8.7892 6.90865L8.01158 8.19134L5.26174 6.52426L5.27644 6.5H5.25Z"
-        fill="currentColor"
-      />
-    </svg>
-  </Box>
-);
-
 export const MintIcon: SvgProps = props => (
   <BaseSvg size="20px" {...props}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

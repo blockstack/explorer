@@ -11,6 +11,7 @@ import {
   FeesApi,
   SearchApi,
   RosettaApi,
+  MicroblocksApi,
 } from '@stacks/blockchain-api-client';
 import { NextPageContext } from 'next';
 import { getServerSideApiServer } from '@common/api/utils';
@@ -27,6 +28,7 @@ export function apiClients(config: Configuration) {
   const accountsApi = new AccountsApi(config);
   const infoApi = new InfoApi(config);
   const transactionsApi = new TransactionsApi(config);
+  const microblocksApi = new MicroblocksApi(config);
   const blocksApi = new BlocksApi(config);
   const faucetsApi = new FaucetsApi(config);
   const bnsApi = new BNSApi(config);
@@ -40,6 +42,7 @@ export function apiClients(config: Configuration) {
     accountsApi,
     infoApi,
     transactionsApi,
+    microblocksApi,
     blocksApi,
     faucetsApi,
     bnsApi,

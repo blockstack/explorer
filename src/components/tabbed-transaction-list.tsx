@@ -9,8 +9,15 @@ import {
 import { useTabs } from '../hooks/use-tabs';
 import { InfiniteTransactionsList } from '@components/infinite-item-list';
 import { Tabs } from '@components/tabs';
+import { Subheader } from './transaction-list-subheader';
 
 const TX_TABS = 'tabs/tx-list';
+
+export enum ListTypes {
+  MICROBLOCK = 'microblock',
+  ANCHOR_BLOCK = 'anchor-block',
+  PENDING = 'pending',
+}
 
 export const TabbedTransactionList: React.FC<{
   limit?: number;
@@ -30,6 +37,7 @@ export const TabbedTransactionList: React.FC<{
     : confirmedActions;
 
   if (!data) return null;
+  console.log(data);
   return (
     <Section
       title={() => (
@@ -42,12 +50,28 @@ export const TabbedTransactionList: React.FC<{
       topRight={!mempoolSelected && infinite && FilterButton}
     >
       <Flex flexGrow={1} flexDirection="column" px="base-loose">
+        {/* TODO: Not sure if this is the best way to handle these two lists? */}
+        {!mempoolSelected && (
+          <>
+            <Subheader subtitle="In microblock" />
+            <InfiniteTransactionsList
+              data={data}
+              showLoadMoreButton={infinite}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              listType={ListTypes.MICROBLOCK}
+            />
+          </>
+        )}
+        {!mempoolSelected && <Subheader subtitle="In anchor block" />}
         <InfiniteTransactionsList
           data={data}
           showLoadMoreButton={infinite}
           isFetchingNextPage={isFetchingNextPage}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
+          listType={!mempoolSelected ? ListTypes.ANCHOR_BLOCK : ListTypes.PENDING}
         />
       </Flex>
     </Section>

@@ -42,6 +42,8 @@ const BlockComponent = React.memo(({ block, ts }: { block: number | string; ts: 
        * TODO: link to block
        */}
       <Box>#{block}</Box>
+      {/* MICROBLOCK TODO: Make this real data if possible? */}
+      {/* <Box ml="extra-tight">(6 confirmations)</Box> */}
       <Box ml="base">
         <Timestamp ts={ts} />
       </Box>

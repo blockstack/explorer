@@ -3,8 +3,9 @@ import { color, Flex, FlexProps, Grid, Spinner } from '@stacks/ui';
 import { Section } from '@components/section';
 import { HoverableItem } from '@components/hoverable';
 import { useBlocksList } from './hooks';
-import { BlockItem } from './block-list-item';
 import { Caption } from '@components/typography';
+import { BlockItem } from './block-list-item';
+import { MicroblockItem } from './microblock-list-item';
 
 export const BlocksList: React.FC<FlexProps & { limit?: number }> = ({ limit, ...props }) => {
   const result = useBlocksList(limit);
@@ -18,12 +19,29 @@ export const BlocksList: React.FC<FlexProps & { limit?: number }> = ({ limit, ..
         {hasBlocks ? (
           items?.map((block, index: number, arr: any) => {
             return (
-              <HoverableItem
-                key={`blocks-list-${block.height}`}
-                isLast={index === blocks.results?.length - 1}
-              >
-                <BlockItem block={block} index={index} length={arr.length} />
-              </HoverableItem>
+              <>
+                <HoverableItem
+                  key={`blocks-list-${block.height}`}
+                  isLast={index === blocks.results?.length - 1}
+                >
+                  <BlockItem block={block} index={index} length={arr.length} />
+                </HoverableItem>
+                {block.microblocks_accepted.map((microblockHash: string, key: number, arr: any) => {
+                  return (
+                    <HoverableItem
+                      key={`microblocks-list-${microblockHash}`}
+                      isLast={key === arr.length - 1}
+                    >
+                      <MicroblockItem
+                        blockTime={block.burn_block_time}
+                        hash={microblockHash}
+                        index={key}
+                        length={arr.length}
+                      />
+                    </HoverableItem>
+                  );
+                })}
+              </>
             );
           })
         ) : (

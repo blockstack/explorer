@@ -22,7 +22,6 @@ const paginatedResponseOffset = atomFamily(_key => atomWithDefault(() => 0), dee
 // ----------------
 export enum BlocksQueryKeys {
   CONFIRMED = 'blocks/CONFIRMED',
-  // TODO: maybe something for microblocks here
   SINGLE = 'blocks/SINGLE',
 }
 
